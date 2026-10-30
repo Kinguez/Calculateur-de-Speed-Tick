@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full bg-slate-900 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculateur de Speed Tick (Summoners War)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between p-4 sm:p-6 md:p-8">
+
+  <main class="max-w-3xl mx-auto w-full bg-slate-900/90 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl backdrop-blur-md">
+    
+    <!-- Header -->
+    <header class="text-center mb-8">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-semibold tracking-wide uppercase mb-3 border border-amber-500/20">
+        <span>SW Speed Tuning</span>
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+        Calculateur de <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-200">Speed Tick</span>
+      </h1>
+      <p class="text-slate-400 text-sm sm:text-base mt-2">
+        Obtenez instantanément la vitesse en plus (<span class="text-amber-300 font-medium">vit en +</span>) requise pour chaque tick selon votre Lead et Vitesse de Base.
+      </p>
+    </header>
+
+    <!-- Controls -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 bg-slate-800/50 p-5 rounded-xl border border-slate-700/50">
+      
+      <!-- Lead Selector -->
+      <div>
+        <label for="leadSelect" class="block text-sm font-bold text-amber-400 mb-2 flex items-center justify-between">
+          <span>Lead Vitesse (Jaune)</span>
+          <span id="leadBadge" class="text-xs bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded font-mono">10%</span>
+        </label>
+        <select id="leadSelect" class="w-full bg-slate-900 border border-amber-500/40 text-slate-100 rounded-lg p-3 text-base font-semibold focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all cursor-pointer">
+          <option value="0">Lead 0%</option>
+          <option value="10" selected>Lead 10%</option>
+          <option value="16">Lead 16%</option>
+          <option value="19">Lead 19%</option>
+          <option value="20">Lead 20%</option>
+          <option value="21">Lead 21%</option>
+          <option value="23">Lead 23%</option>
+          <option value="24">Lead 24%</option>
+          <option value="28">Lead 28%</option>
+          <option value="30">Lead 30%</option>
+          <option value="33">Lead 33%</option>
+        </select>
+      </div>
+
+      <!-- Base Speed Input -->
+      <div>
+        <label for="baseSpeedInput" class="block text-sm font-bold text-orange-400 mb-2 flex items-center justify-between">
+          <span>Vitesse de Base (Orange)</span>
+          <span class="text-xs text-slate-400 font-normal">89 - 125</span>
+        </label>
+        <div class="flex items-center gap-2">
+          <input type="number" id="baseSpeedInput" min="89" max="125" value="89" 
+            class="w-full bg-slate-900 border border-orange-500/40 text-slate-100 rounded-lg p-3 text-base font-bold font-mono focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all">
+        </div>
+        <input type="range" id="baseSpeedSlider" min="89" max="125" value="89" class="w-full mt-3 accent-orange-500 cursor-pointer">
+      </div>
+
+    </div>
+
+    <!-- Results Display -->
+    <div class="space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+          <span>Vitesse en + Nécessaire</span>
+        </h2>
+        <span id="currentConfigText" class="text-xs text-slate-400 font-mono">Lead 10% | Base Speed 89</span>
+      </div>
+
+      <!-- Grid of Ticks -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3" id="ticksContainer">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- Quick Table View (Expandable/Interactive) -->
+    <div class="mt-8 pt-6 border-t border-slate-800">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-sm font-semibold text-slate-400">Aperçu rapide du Lead sélectionné</h3>
+        <span class="text-xs text-slate-500">Tous les Ticks pour Lead <span id="tableLeadText">10%</span></span>
+      </div>
+      <div class="overflow-x-auto rounded-lg border border-slate-800 max-h-48 overflow-y-auto">
+        <table class="w-full text-xs text-center font-mono">
+          <thead class="bg-slate-800/80 sticky top-0 text-slate-300">
+            <tr>
+              <th class="p-2 border-b border-slate-700">Base Spd</th>
+              <th class="p-2 border-b border-slate-700 text-emerald-400">Tick 4</th>
+              <th class="p-2 border-b border-slate-700 text-teal-400">Tick 5</th>
+              <th class="p-2 border-b border-slate-700 text-cyan-400">Tick 6</th>
+              <th class="p-2 border-b border-slate-700 text-blue-400">Tick 7</th>
+              <th class="p-2 border-b border-slate-700 text-purple-400">Tick 8</th>
+            </tr>
+          </thead>
+          <tbody id="quickTableBody" class="divide-y divide-slate-800/50">
+            <!-- Table rows rendered dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="text-center text-xs text-slate-500 mt-6">
+    Basé sur le tableau officiel de réglage de vitesse (Swift: FAUX)
+  </footer>
+
+  <script>
+    // Exact lookup database for all Lead % and Base Speeds (89 to 125) extracted directly from reference tables
+    const TICK_DATA = {
+      0: {
+        4: [255,254,253,252,251,249,248,247,246,245,244,243,241,240,239,238,237,236,234,233,232,231,230,229,228,226,225,224,223,222,221,220,218,217,216,215,214,213],
+        5: [183,182,181,180,179,177,176,175,174,173,172,171,169,168,167,166,165,164,162,161,160,159,158,157,156,154,153,152,151,149,148,147,146,145,144,143,142,141],
+        6: [136,135,134,133,132,130,129,128,127,126,125,124,122,121,120,119,118,117,115,114,113,112,111,110,109,107,106,105,104,103,102,101,99,98,97,96,95,94],
+        7: [102,101,100,99,98,96,95,94,93,92,91,90,88,87,86,85,84,83,81,80,79,78,77,76,75,73,72,71,70,69,68,67,65,64,63,62,61,60],
+        8: [76,75,74,73,72,70,69,68,67,66,65,64,62,61,60,59,58,57,55,54,53,52,51,50,49,47,46,45,44,43,42,41,39,38,37,36,35,34]
+      },
+      10: {
+        4: [246,245,244,243,241,240,239,238,236,235,234,233,231,230,229,228,226,225,224,223,221,220,219,218,216,215,214,213,211,210,209,208,206,205,204,203,201,200],
+        5: [174,173,172,171,169,168,167,166,164,163,162,161,159,158,157,156,154,153,152,151,149,148,147,146,144,143,142,141,139,138,137,136,134,133,132,131,129,128],
+        6: [127,126,125,124,122,121,120,119,117,116,115,114,112,111,110,109,107,106,105,104,102,101,100,99,97,96,95,94,92,91,90,89,87,86,85,84,82,81],
+        7: [93,92,91,90,88,87,86,85,83,82,81,80,78,77,76,75,73,72,71,70,68,67,66,65,63,62,61,60,58,57,56,55,53,52,51,50,48,47],
+        8: [67,66,65,64,62,61,60,59,57,56,55,54,52,51,50,49,47,46,45,44,42,41,40,39,37,36,35,34,32,31,30,29,27,26,25,24,22,21]
+      },
+      16: {
+        4: [241,240,238,237,236,234,233,232,230,229,228,227,225,224,223,221,220,219,217,216,215,213,212,211,209,208,207,206,204,203,202,200,199,198,196,195,194,192],
+        5: [169,168,166,165,164,162,161,160,158,157,156,155,153,152,151,149,148,147,145,144,143,141,140,139,137,136,135,134,132,131,130,128,127,126,124,123,122,120],
+        6: [122,121,119,118,117,115,114,113,111,110,109,108,106,105,104,102,101,100,98,97,96,94,93,92,90,89,88,87,85,84,83,81,80,79,77,76,75,73],
+        7: [88,87,85,84,83,81,80,79,77,76,75,74,72,71,70,68,67,66,64,63,62,60,59,58,56,55,54,53,51,50,49,47,46,45,43,42,41,39],
+        8: [62,61,59,58,57,55,54,53,51,50,49,48,46,45,44,42,41,40,38,37,36,34,33,32,30,29,28,27,25,24,23,21,20,19,17,16,15,13]
+      },
+      19: {
+        4: [238,237,236,234,233,232,230,229,228,226,225,224,222,221,219,218,217,215,214,213,211,210,209,207,206,205,203,202,201,199,198,197,195,194,193,191,190,189],
+        5: [166,165,164,162,161,160,158,157,156,154,153,152,150,149,147,146,145,143,142,141,139,138,137,135,134,133,131,130,129,127,126,125,123,122,121,119,118,117],
+        6: [119,118,117,115,114,113,111,110,109,107,106,105,103,102,100,99,98,96,95,94,92,91,90,88,87,86,84,83,82,80,79,78,76,75,74,72,71,70],
+        7: [85,84,83,81,80,79,77,76,75,73,72,71,69,68,66,65,64,62,61,60,58,57,56,54,53,52,50,49,48,46,45,44,42,41,40,38,37,36],
+        8: [59,58,57,55,54,53,51,50,49,47,46,45,43,42,40,39,38,36,35,34,32,31,30,28,27,26,24,23,22,20,19,18,16,15,14,12,11,10]
+      },
+      20: {
+        4: [237,236,235,233,232,231,229,228,227,225,224,223,221,220,218,217,216,214,213,212,210,209,208,206,205,204,202,201,200,198,197,196,194,193,191,190,189,187],
+        5: [165,164,163,161,160,159,157,156,155,153,152,151,149,148,146,145,144,142,141,140,138,137,136,134,133,132,130,129,128,126,125,124,122,121,119,118,117,115],
+        6: [118,117,116,114,113,112,110,109,108,106,105,104,102,101,99,98,97,95,94,93,91,90,89,87,86,85,83,82,81,79,78,77,75,74,72,71,70,68],
+        7: [84,83,82,80,79,78,76,75,74,72,71,70,68,67,65,64,63,61,60,59,57,56,55,53,52,51,49,48,47,45,44,43,41,40,38,37,36,34],
+        8: [58,57,56,54,53,52,50,49,48,46,45,44,42,41,39,38,37,35,34,33,31,30,29,27,26,25,23,22,21,19,18,17,15,14,12,11,10,8]
+      },
+      21: {
+        4: [236,235,234,232,231,230,228,227,226,224,223,222,220,219,217,216,215,213,212,211,209,208,207,205,204,202,201,200,198,197,196,194,193,192,190,189,188,186],
+        5: [164,163,162,160,159,158,156,155,154,152,151,150,148,147,145,144,143,141,140,139,137,136,135,133,132,130,129,128,126,125,124,122,121,120,118,117,116,114],
+        6: [117,116,115,113,112,111,109,108,107,105,104,103,101,100,98,97,96,94,93,92,90,89,88,86,85,83,82,81,79,78,77,75,74,73,71,70,69,67],
+        7: [83,82,81,79,78,77,75,74,73,71,70,69,67,66,64,63,62,60,59,58,56,55,54,52,51,49,48,47,45,44,43,41,40,39,37,36,35,33],
+        8: [57,56,55,53,52,51,49,48,47,45,44,43,41,40,38,37,36,34,33,32,30,29,28,26,25,23,22,21,19,18,17,15,14,13,11,10,9,7]
+      },
+      23: {
+        4: [235,233,232,231,229,228,226,225,224,222,221,218,217,215,214,213,211,210,208,207,206,204,203,202,200,199,197,196,195,193,192,191,189,188,186,185,184],
+        5: [163,161,160,159,157,156,154,153,152,150,149,146,145,143,142,141,139,138,136,135,134,132,131,130,128,127,125,124,123,121,120,119,117,116,114,113,112],
+        6: [116,114,113,112,110,109,107,106,105,103,102,99,98,96,95,94,92,91,89,88,87,85,84,83,81,80,78,77,76,74,73,72,70,69,67,66,65],
+        7: [82,80,79,78,76,75,73,72,71,69,68,65,64,62,61,60,58,57,55,54,53,51,50,49,47,46,44,43,42,40,39,38,36,35,33,32,31],
+        8: [56,54,53,52,50,49,47,46,45,43,42,39,38,36,35,34,32,31,29,28,27,25,24,23,21,20,18,17,16,14,13,12,10,9,7,6,5]
+      },
+      24: {
+        4: [234,232,231,230,228,227,225,224,223,221,220,219,217,216,214,213,212,210,209,207,206,205,203,202,200,199,197,196,195,193,192,191,189,188,187,185,184,182],
+        5: [162,160,159,158,156,155,153,152,151,149,148,147,145,144,142,141,140,138,137,135,134,133,131,130,128,127,125,124,123,121,120,119,117,116,115,113,112,110],
+        6: [115,113,112,111,109,108,106,105,104,102,101,100,98,97,95,94,93,91,90,88,87,86,84,83,81,80,78,77,76,74,73,72,70,69,68,66,65,63],
+        7: [81,79,78,77,75,74,72,71,70,68,67,66,64,63,61,60,59,57,56,54,53,52,50,49,47,46,44,43,42,40,39,38,36,35,34,32,31,29],
+        8: [55,53,52,51,49,48,46,45,44,42,41,40,38,37,35,34,33,31,30,28,27,26,24,23,21,20,18,17,16,14,13,12,10,9,8,6,5,3]
+      },
+      28: {
+        4: [230,229,227,226,225,223,222,220,219,217,216,215,213,212,210,209,207,206,204,203,202,200,199,197,196,194,193,192,190,189,187,186,185,183,182,180,179,177],
+        5: [158,157,155,154,153,151,150,148,147,145,144,143,141,140,138,137,135,134,132,131,130,128,127,125,124,122,121,120,118,117,115,114,113,111,110,108,107,105],
+        6: [111,110,108,107,106,104,103,101,100,98,97,96,94,93,91,90,88,87,85,84,83,81,80,78,77,75,74,73,71,70,68,67,66,64,63,61,60,58],
+        7: [77,76,74,73,72,70,69,67,66,64,63,62,60,59,57,56,54,53,51,50,49,47,46,44,43,41,40,39,37,36,34,33,32,30,29,27,26,24],
+        8: [51,50,48,47,46,44,43,41,40,38,37,36,34,33,31,30,28,27,25,24,23,21,20,18,17,15,14,13,11,10,8,7,6,4,3,1,0]
+      },
+      30: {
+        4: [228,227,226,224,223,221,220,218,217,215,214,213,211,210,208,207,205,204,202,201,199,198,197,195,194,192,191,189,188,186,185,184,182,181,179,178,176,175],
+        5: [156,155,154,152,151,149,148,146,145,143,142,141,139,138,136,135,133,132,130,129,127,126,125,123,122,120,119,117,116,114,113,112,110,109,107,106,104,103],
+        6: [109,108,107,105,104,102,101,99,98,96,95,94,92,91,89,88,86,85,83,82,80,79,78,76,75,73,72,70,69,67,66,65,63,62,60,59,57,56],
+        7: [75,74,73,71,70,68,67,65,64,62,61,60,58,57,55,54,52,51,49,48,46,45,44,42,41,39,38,36,35,33,32,31,29,28,26,25,23,22],
+        8: [49,48,47,45,44,42,41,39,38,36,35,34,32,31,29,28,26,25,23,22,20,19,18,16,15,13,12,10,9,7,6,5,3,2,0,0,0]
+      },
+      33: {
+        4: [226,224,223,221,220,218,217,215,214,212,211,210,208,207,205,204,202,201,199,198,196,195,193,192,190,189,187,186,184,183,181,180,178,177,175,174,173,171],
+        5: [154,152,151,149,148,146,145,143,142,140,139,138,136,135,133,132,130,129,127,126,124,123,121,120,118,117,115,114,112,111,109,108,106,105,103,102,101,99],
+        6: [107,105,104,102,101,99,98,96,95,93,92,91,89,88,86,85,83,82,80,79,77,76,74,73,71,70,68,67,65,64,62,61,59,58,56,55,54,52],
+        7: [73,71,70,68,67,65,64,62,61,59,58,57,55,54,52,51,49,48,46,45,43,42,40,39,37,36,34,33,31,30,28,27,25,24,22,21,20,18],
+        8: [47,45,44,42,41,39,38,36,35,33,32,31,29,28,26,25,23,22,20,19,17,16,14,13,11,10,8,7,5,4,2,1,0,0,0,0,0]
+      }
+    };
+
+    // DOM Elements
+    const leadSelect = document.getElementById('leadSelect');
+    const baseSpeedInput = document.getElementById('baseSpeedInput');
+    const baseSpeedSlider = document.getElementById('baseSpeedSlider');
+    const leadBadge = document.getElementById('leadBadge');
+    const currentConfigText = document.getElementById('currentConfigText');
+    const ticksContainer = document.getElementById('ticksContainer');
+    const quickTableBody = document.getElementById('quickTableBody');
+    const tableLeadText = document.getElementById('tableLeadText');
+
+    // Color maps for Ticks
+    const tickColors = {
+      4: { bg: 'bg-emerald-950/40', border: 'border-emerald-500/40', text: 'text-emerald-400', badge: 'bg-emerald-500/20 text-emerald-300' },
+      5: { bg: 'bg-teal-950/40', border: 'border-teal-500/40', text: 'text-teal-400', badge: 'bg-teal-500/20 text-teal-300' },
+      6: { bg: 'bg-cyan-950/40', border: 'border-cyan-500/40', text: 'text-cyan-400', badge: 'bg-cyan-500/20 text-cyan-300' },
+      7: { bg: 'bg-blue-950/40', border: 'border-blue-500/40', text: 'text-blue-400', badge: 'bg-blue-500/20 text-blue-300' },
+      8: { bg: 'bg-purple-950/40', border: 'border-purple-500/40', text: 'text-purple-400', badge: 'bg-purple-500/20 text-purple-300' }
+    };
+
+    function update() {
+      const lead = parseInt(leadSelect.value, 10);
+      let baseSpeed = parseInt(baseSpeedInput.value, 10);
+
+      // Clamp baseSpeed between 89 and 125
+      if (isNaN(baseSpeed) || baseSpeed < 89) baseSpeed = 89;
+      if (baseSpeed > 125) baseSpeed = 125;
+
+      // Keep inputs in sync
+      baseSpeedInput.value = baseSpeed;
+      baseSpeedSlider.value = baseSpeed;
+      leadBadge.textContent = `${lead}%`;
+      tableLeadText.textContent = `${lead}%`;
+      currentConfigText.textContent = `Lead ${lead}% | Base Speed ${baseSpeed}`;
+
+      const index = baseSpeed - 89;
+      const leadData = TICK_DATA[lead];
+
+      // Render cards
+      ticksContainer.innerHTML = [4, 5, 6, 7, 8].map(tick => {
+        const value = leadData[tick][index];
+        const style = tickColors[tick];
+        return `
+          <div class="${style.bg} border ${style.border} p-4 rounded-xl flex flex-col justify-between items-center text-center shadow-lg transition-transform hover:-translate-y-1">
+            <span class="text-xs font-bold ${style.badge} px-2.5 py-1 rounded-full uppercase tracking-wider mb-2">
+              Tick ${tick}
+            </span>
+            <div class="my-1">
+              <span class="text-3xl sm:text-4xl font-black ${style.text} tracking-tight font-mono">${value}</span>
+              <span class="block text-[10px] text-slate-400 mt-1 uppercase tracking-widest font-semibold">vit en +</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Render mini reference table
+      renderQuickTable(lead, baseSpeed);
+    }
+
+    function renderQuickTable(lead, currentBaseSpeed) {
+      const leadData = TICK_DATA[lead];
+      let html = '';
+      for (let spd = 89; spd <= 125; spd++) {
+        const idx = spd - 89;
+        const isCurrent = spd === currentBaseSpeed;
+        const rowBg = isCurrent ? 'bg-amber-500/20 text-white font-bold' : 'hover:bg-slate-800/40 text-slate-300';
+        
+        html += `
+          <tr class="${rowBg} cursor-pointer transition-colors" onclick="setBaseSpeed(${spd})">
+            <td class="p-2 font-bold text-orange-400">${spd}</td>
+            <td class="p-2">${leadData[4][idx]}</td>
+            <td class="p-2">${leadData[5][idx]}</td>
+            <td class="p-2">${leadData[6][idx]}</td>
+            <td class="p-2">${leadData[7][idx]}</td>
+            <td class="p-2">${leadData[8][idx]}</td>
+          </tr>
+        `;
+      }
+      quickTableBody.innerHTML = html;
+    }
+
+    window.setBaseSpeed = function(spd) {
+      baseSpeedInput.value = spd;
+      update();
+    };
+
+    // Event listeners
+    leadSelect.addEventListener('change', update);
+    baseSpeedInput.addEventListener('input', update);
+    baseSpeedSlider.addEventListener('input', (e) => {
+      baseSpeedInput.value = e.target.value;
+      update();
+    });
+
+    // Initial load
+    update();
+  </script>
+</body>
+</html>
